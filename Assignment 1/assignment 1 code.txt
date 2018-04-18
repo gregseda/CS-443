@@ -1,0 +1,153 @@
+Question #1 Script
+
+DROP TABLE Used;
+DROP TABLE Sold;
+DROP TABLE Item;
+DROP TABLE Product;
+DROP TABLE Receipt;
+
+CREATE TABLE Receipt
+(
+        ReceiptNumber   NUMBER
+                        CONSTRAINT      RNull   NOT NULL,
+        SalesDate       DATE,
+                        CONSTRAINT      ReceiptPK       PRIMARY KEY(ReceiptNumber)
+);
+
+CREATE TABLE Product
+(
+        ProductId       NUMBER,
+        ProductDescription      VARCHAR(200),
+                        CONSTRAINT      ProductPK       PRIMARY KEY(ProductId)
+);
+
+CREATE TABLE Item
+(
+        ItemNum NUMBER
+                CONSTRAINT      INULL   NOT NULL,
+        ItemDescription VARCHAR(200),
+                CONSTRAINT      ItemPK  PRIMARY KEY(ItemNum)
+);
+
+CREATE TABLE Sold
+(
+        ProductId       NUMBER,
+        ReceiptNumber   INTEGER
+                CONSTRAINT      RNNull  NOT NULL,
+        QuantitySold    NUMBER,
+                CONSTRAINT      CheckQS CHECK (QuantitySold >= 0),
+                CONSTRAINT    SoldFK FOREIGN KEY(ProductId)
+                            References  Product(ProductId),
+                CONSTRAINT SoldFK2 FOREIGN KEY(ReceiptNumber)
+                           References Receipt(ReceiptNumber),
+              CONSTRAINT SoldPK PRIMARY KEY(ProductId, ReceiptNumber)
+);
+
+CREATE TABLE Used
+(
+        ProductId       NUMBER,
+        ItemNum                 NUMBER
+                CONSTRAINT      INNull  NOT NULL,
+        QuantityUsed    NUMBER
+                CONSTRAINT      CheckQU CHECK (QuantityUsed >= 0),
+                CONSTRAINT    UsedFK        FOREIGN KEY(ProductId)
+                            REFERENCES  Product(ProductId),
+                CONSTRAINT      UsedFK2 FOREIGN KEY(ItemNum)
+                        REFERENCES Item(ItemNum),
+           CONSTRAINT UsedPK PRIMARY KEY(ProductId, ItemNum)
+);
+
+
+
+Question #2 Script
+
+
+DROP TABLE "TREATMENT" CASCADE CONSTRAINTS;
+DROP TABLE "ROOM" CASCADE CONSTRAINTS;
+DROP TABLE "PHYSICIAN" CASCADE CONSTRAINTS;
+DROP TABLE "PATIENT" CASCADE CONSTRAINTS;
+DROP TABLE "DEPARTMENT" CASCADE CONSTRAINTS;
+
+CREATE TABLE Treatment
+(
+        TreatId         NUMBER,
+        TreatCost       DECIMAL(10,2),
+        TreatDesc       VARCHAR(200),
+                CONSTRAINT TCCHECK CHECK(TreatCost >= 50.00),
+                CONSTRAINT      TreatmentPK PRIMARY KEY(TreatId)
+);
+
+CREATE TABLE Room
+(
+        RoomNo          NUMBER
+                CONSTRAINT      CheckRoomNo     CHECK (RoomNo >= 100 AND RoomNo <= 999),
+        RoomRate        DECIMAL(10,2)
+                CONSTRAINT      CheckRoomRate   CHECK (RoomRate >= 30.00 AND RoomRate <= 100.00),
+        RoomPhone       VARCHAR(8),
+                CONSTRAINT      RoomPK  PRIMARY KEY(RoomNo)
+);
+
+CREATE TABLE Department
+(
+        DeptID  NUMBER,
+        DeptSupervisorId        NUMBER,
+                CONSTRAINT      DeptPK  PRIMARY KEY(DeptID)
+);
+
+CREATE TABLE Physician
+(
+        PhysID          NUMBER,
+        PhysName        VARCHAR(50)
+                CONSTRAINT      PNNull  NOT NULL,
+        TreatId NUMBER,
+        DeptID NUMBER,
+               CONSTRAINT       PhysFK  FOREIGN KEY(TreatId)
+                        REFERENCES      Treatment(TreatId) ON DELETE CASCADE,
+                CONSTRAINT      PhysFK2 FOREIGN KEY(DeptID)
+                        REFERENCES      Department(DeptID) ON DELETE CASCADE,
+                CONSTRAINT PhysPK PRIMARY KEY(PhysID)
+);
+
+ALTER TABLE Department
+      ADD CONSTRAINT DeptSupervisorIdFK FOREIGN KEY(DeptSupervisorId)
+                  REFERENCES Physician(PhysID);
+
+CREATE TABLE Patient
+(
+        PatientID       NUMBER,
+        PhysId                  NUMBER,
+        RoomNo                          NUMBER
+                CONSTRAINT      RoomNoCheck     CHECK (RoomNo >= 100 AND RoomNo <= 999),
+        HospitalStayDays                NUMBER
+                CONSTRAINT      HSDCheck        CHECK (HospitalStayDays >= 0),
+        PatientName     VARCHAR(50)
+                CONSTRAINT      PatientNameNull NOT NULL,
+        PatientAddress  VARCHAR(200)
+                CONSTRAINT      PatientAddressNull NOT NULL,
+        AdminDate       DATE,
+                CONSTRAINT PatientFK FOREIGN KEY(PhysId)
+                     REFERENCES Physician(PhysId) ON DELETE CASCADE,
+                CONSTRAINT PatientFK2 FOREIGN KEY(RoomNo)
+                      REFERENCES Room(RoomNo) ON DELETE CASCADE,
+                 CONSTRAINT PatientPK PRIMARY KEY(PatientId)
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
