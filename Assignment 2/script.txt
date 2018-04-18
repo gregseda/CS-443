@@ -1,0 +1,98 @@
+DROP TABLE Customer cascade constraints;
+DROP TABLE Caretaker cascade constraints;
+DROP TABLE Hotel cascade constraints;
+DROP TABLE Manager cascade constraints;
+DROP TABLE Room cascade constraints;
+
+CREATE TABLE Hotel
+(
+	hNum NUMBER,
+	hPhone CHAR(7)
+		CONSTRAINT hPhoneNull NOT NULL
+		CONSTRAINT hPhoneUNI UNIQUE
+		CONSTRAINT hPhoneCheck CHECK(hPhone >= '2202222' AND hPhone <= '9909999'),
+	hNoOfRooms NUMBER
+		CONSTRAINT NoOfRoomsCHECK CHECK(hNoOfRooms > 0 AND hNoOfRooms <= 200),
+	hAdd VARCHAR(50),
+	mId NUMBER
+		CONSTRAINT mIdHotelCheck CHECK(mId >= 111111 AND mId <= 999999),
+		CONSTRAINT HotelPK PRIMARY KEY(hNum)
+);
+
+CREATE TABLE Room
+(
+	rNum NUMBER
+		CONSTRAINT rNumCheck CHECK(rNum > 0 AND rNum <= 200),
+	hNum NUMBER,
+	rLoc NUMBER
+		CONSTRAINT rLocCheck CHECK(rLoc > 0 AND rLoc <= 100),
+	rRate NUMBER(5,2)
+		CONSTRAINT rRateCheck CHECK(rRate >= 50),
+	rOccupied CHAR(5)
+		CONSTRAINT rOccupiedCheck CHECK(rOccupied = 'false' OR rOccupied = 'true'),
+	rSize NUMBER
+		CONSTRAINT rSizeCheck CHECK(rSize >= 2 AND rSize <= 4),
+		CONSTRAINT RoomPk PRIMARY KEY(rNum, hNum)
+);
+
+CREATE TABLE Manager
+(
+	mId NUMBER
+		CONSTRAINT mIdCheck CHECK(mId >= 111111 AND mId <= 999999),
+	mEmail VARCHAR(100),
+	mSal NUMBER(7,2),
+	mAdd VARCHAR(50),
+	mPhone CHAR(7)
+		CONSTRAINT mPhoneCheck CHECK(mPhone >= '2222222' AND mPhone <= '9999999'),
+	mName VARCHAR(50),
+		CONSTRAINT ManagerPK PRIMARY KEY(mId)
+);
+
+CREATE TABLE Caretaker
+(
+	ctId NUMBER
+		CONSTRAINT ctIdCheck CHECK(ctId >= 111111 AND ctId <= 999999),
+	ctName VARCHAR(50),
+	ctPhone CHAR(7)
+		CONSTRAINT ctPhoneCheck CHECK(ctPhone >= '2222222' AND ctPhone <= '9999999'),
+	ctEmail VARCHAR(200),
+	ctAdd VARCHAR(50),
+	ctSal NUMBER(7,2)
+		CONSTRAINT ctSalCheck CHECK(ctSal > 20000 AND ctSal < 40000),
+	hNum NUMBER,
+		CONSTRAINT CaretakerPk PRIMARY KEY(ctId)
+);
+
+CREATE TABLE Customer
+(
+	cNum NUMBER,
+	cName VARCHAR(50),
+	cSSN CHAR(9)
+		CONSTRAINT cSSNCheck CHECK(cSSN > '660000000' AND cSSN <= '609999999'),
+	cCreditCard VARCHAR(25),
+	cAdd VARCHAR(50),
+	cStartDate DATE,
+	cEndDate DATE,
+	hNum NUMBER,
+	rNum NUMBER
+		CONSTRAINT rNumCustCheck CHECK(rNum > 0 AND rNum <= 200),
+	cAmtOwing NUMBER(7,1),
+		CONSTRAINT CustomerPK PRIMARY KEY(cSSN)
+);
+
+ALTER TABLE Hotel
+	ADD CONSTRAINT HotelFK FOREIGN KEY(mId)
+		REFERENCES Manager(mId);
+ALTER TABLE Room
+	ADD CONSTRAINT RoomFK FOREIGN KEY(hNum)
+		REFERENCES Hotel(hNum);
+ALTER TABLE Caretaker
+	ADD CONSTRAINT CaretakerFK FOREIGN KEY(hNum)
+		REFERENCES Hotel(hNum);
+ALTER TABLE Customer
+	ADD CONSTRAINT CustomerFK FOREIGN KEY(hNum)
+		REFERENCES Hotel(hNum);
+ALTER TABLE Customer 
+	ADD CONSTRAINT CustomerFK2 FOREIGN KEY(rNum, hNum)
+		REFERENCES Room(rNum, hNum);
+	
